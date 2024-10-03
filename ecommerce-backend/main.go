@@ -1,25 +1,21 @@
 package main
 
 import (
-	"log"
-	"net/http"
+	"ecommerce-backend/routes"
+	"ecommerce-backend/initializers"
 
 	"github.com/gin-gonic/gin"
 )
 
+func init() {
+	initializers.LoadEnvVariables()
+	initializers.ConnectToDb()
+	initializers.SyncDatabase()
+}
+
 func main() {
-    // Create a new Gin router
-    r := gin.Default()
-
-    // Define a route for the root endpoint
-    r.GET("/", func(c *gin.Context) {
-        c.String(http.StatusOK, "Welcome to the eCommerce API")
-    })
-
-    // Start the server on port 8000
-	log.Println("Server is running on http://localhost:8000")
-    if err := r.Run(":8000"); err != nil {
-        log.Fatal(err)
-    }
+	r := gin.Default()
+	api.Routes(r)
+	r.Run()
 }
 
