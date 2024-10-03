@@ -1,9 +1,9 @@
-
+import ProductsPage from "./pages/ProductsPage"
 function App() {
 
     return (
         <div>
-            <h1 className='text-xl font-bold'>Hello world</h1>
+            <ProductsPage/>
         </div>
     )
 }
