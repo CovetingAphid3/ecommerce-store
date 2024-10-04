@@ -3,6 +3,7 @@ package controllers
 import (
 	"ecommerce-backend/initializers"
 	"ecommerce-backend/models"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -23,6 +24,7 @@ func CreateProduct(c *gin.Context) {
 	var body struct {
 		Name        string  `json:"name"`
 		Description string  `json:"description"`
+		Category    string  `json:"category"`
 		Price       float64 `json:"price"`
 	}
 	if c.Bind(&body) != nil {
@@ -30,17 +32,31 @@ func CreateProduct(c *gin.Context) {
 		return
 	}
 
-	product := models.Product{Name: body.Name, Description: body.Description, Price: body.Price}
-	result := initializers.DB.Create(&product)
+	// Log received body for debugging
+	fmt.Printf("Received body: %+v\n", body)
 
-	if result.Error != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to create poduct"})
+	if body.Category == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "category is required"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "product created succesfully"})
+	product := models.Product{
+		Name:        body.Name,
+		Description: body.Description,
+		Price:       body.Price,
+		Category:    body.Category,
+	}
 
+	result := initializers.DB.Create(&product)
+
+	if result.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to create product"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "product created successfully"})
 }
+
 
 // read
 func GetAllProducts(c *gin.Context) {
@@ -54,9 +70,9 @@ func GetAllProducts(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"products": products})
 }
+
 func GetProductById(c *gin.Context) {
 	productID, err := parseProductID(c)
-
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid poduct ID"})
 		return
@@ -71,12 +87,10 @@ func GetProductById(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"product": product})
-
 }
 
 // update
 func UpdateProduct(c *gin.Context) {
-
 	var body struct {
 		Name        string  `json:"name"`
 		Description string  `json:"description"`
@@ -88,7 +102,6 @@ func UpdateProduct(c *gin.Context) {
 	}
 
 	productID, err := parseProductID(c)
-
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid poduct ID"})
 		return
@@ -111,7 +124,6 @@ func UpdateProduct(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "product updated successfully"})
-
 }
 
 // delete
